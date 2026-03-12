@@ -24,6 +24,14 @@ public class PeliculaService {
         return peliculaRepository.findById(id);
     }
 
+    public List<Pelicula> buscarPorClasificacion(String clasificacion) {
+        return peliculaRepository.findByClasificacion(clasificacion);
+    }
+
+    public List<Pelicula> buscarPorTitulo(String titulo) {
+        return peliculaRepository.findByTitulo(titulo);
+    }
+
     @Transactional
     public Pelicula crear(Pelicula pelicula) {
         return peliculaRepository.save(pelicula);
