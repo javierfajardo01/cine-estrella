@@ -6,5 +6,6 @@ public enum Clasificacion {
     DRAMA,
     TERROR,
     SUSPENSE,
-    MUSICAL
+    MUSICAL,
+    ANIMACION
 }

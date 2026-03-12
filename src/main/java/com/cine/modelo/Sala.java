@@ -15,9 +15,12 @@ public class Sala {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private int numero;
 
+    @Column(nullable = false)
     private int capacidadMaxima;
 
+    @Column(nullable = false)
     private boolean tiene3D;
 }

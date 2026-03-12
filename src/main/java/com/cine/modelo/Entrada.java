@@ -15,8 +15,10 @@ public class Entrada {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private int asiento;
 
+    @Column(nullable = false)
     private String nombreCliente;
 
     @ManyToOne

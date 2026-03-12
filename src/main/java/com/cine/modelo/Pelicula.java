@@ -18,10 +18,13 @@ public class Pelicula {
     @Column(nullable = false)
     private String titulo;
 
+    @Column(nullable = false)
     private String director;
 
+    @Column(nullable = false)
     private int duracion;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Clasificacion clasificacion;
 }
