@@ -1,0 +1,1 @@
+-me puedes generar un script sql que rellene las tablas correspondientes a las clases del modelo con datos de prueba?

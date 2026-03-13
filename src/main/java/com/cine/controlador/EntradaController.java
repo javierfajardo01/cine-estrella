@@ -30,6 +30,26 @@ public class EntradaController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/sesion/{sesionId}")
+    public List<Entrada> buscarPorSesionId(@PathVariable Long sesionId) {
+        return entradaService.buscarPorSesionId(sesionId);
+    }
+
+    @GetMapping("/nombre/{nombreCliente}")
+    public List<Entrada> buscarPorNombreCliente(@PathVariable String nombreCliente) {
+        return entradaService.buscarPorNombreCliente(nombreCliente);
+    }
+
+    @GetMapping("/asiento/{asiento}")
+    public List<Entrada> buscarPorAsiento(@PathVariable int asiento) {
+        return entradaService.buscarPorAsiento(asiento);
+    }
+
+    @GetMapping("/sesion/{sesionId}/asiento/{asiento}")
+    public List<Entrada> buscarPorSesionYAsiento(@PathVariable Long sesionId, @PathVariable int asiento) {
+        return entradaService.buscarPorSesionYAsiento(sesionId, asiento);
+    }
+
     @PostMapping
     public ResponseEntity<Entrada> crear(@jakarta.validation.Valid @RequestBody Entrada entrada) {
         return ResponseEntity.status(HttpStatus.CREATED).body(entradaService.crear(entrada));

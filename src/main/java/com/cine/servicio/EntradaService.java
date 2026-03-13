@@ -25,6 +25,22 @@ public class EntradaService {
         return entradaRepository.findById(id);
     }
 
+    public List<Entrada> buscarPorSesionId(Long sesionId) {
+        return entradaRepository.findBySesionId(sesionId);
+    }
+
+    public List<Entrada> buscarPorNombreCliente(String nombreCliente) {
+        return entradaRepository.findByNombreCliente(nombreCliente);
+    }
+
+    public List<Entrada> buscarPorAsiento(int asiento) {
+        return entradaRepository.findByAsiento(asiento);
+    }
+
+    public List<Entrada> buscarPorSesionYAsiento(Long sesionId, int asiento){
+        return entradaRepository.findBySesionIdAndAsiento(sesionId, asiento);
+    }
+
     @Transactional
     public Entrada crear(Entrada entrada){
         return entradaRepository.save(entrada);
