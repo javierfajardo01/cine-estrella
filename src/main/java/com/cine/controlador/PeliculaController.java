@@ -1,5 +1,6 @@
 package com.cine.controlador;
 
+import com.cine.modelo.Clasificacion;
 import com.cine.modelo.Pelicula;
 import com.cine.servicio.PeliculaService;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/peliculas")
 public class PeliculaController {
+    //http://localhost:8080/swagger-ui.html
+
     private final PeliculaService peliculaService;
 
     public PeliculaController(PeliculaService peliculaService) {
@@ -49,8 +52,8 @@ public class PeliculaController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{clasificacion}")
-    public List<Pelicula> buscarPorClasificacion(@PathVariable String clasificacion) {
+    @GetMapping("/clasificacion/{clasificacion}")
+    public List<Pelicula> buscarPorClasificacion(@PathVariable Clasificacion clasificacion) {
         return peliculaService.buscarPorClasificacion(clasificacion);
     }
 }

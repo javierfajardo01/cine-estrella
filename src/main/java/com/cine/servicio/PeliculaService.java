@@ -1,5 +1,6 @@
 package com.cine.servicio;
 
+import com.cine.modelo.Clasificacion;
 import com.cine.modelo.Pelicula;
 import com.cine.repositorio.PeliculaRepository;
 import jakarta.transaction.Transactional;
@@ -24,7 +25,7 @@ public class PeliculaService {
         return peliculaRepository.findById(id);
     }
 
-    public List<Pelicula> buscarPorClasificacion(String clasificacion) {
+    public List<Pelicula> buscarPorClasificacion(Clasificacion clasificacion) {
         return peliculaRepository.findByClasificacion(clasificacion);
     }
 
