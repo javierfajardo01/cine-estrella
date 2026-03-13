@@ -1,6 +1,7 @@
 package com.cine.modelo;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,9 +16,11 @@ public class Sala {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Positive(message = "El número de la sala debe ser mayor que 0")
     @Column(nullable = false)
     private int numero;
 
+    @Positive(message = "La capacidad máxima debe ser mayor que 0")
     @Column(nullable = false)
     private int capacidadMaxima;
 
