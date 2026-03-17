@@ -11,7 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/peliculas")
 public class PeliculaController {
-    //http://localhost:8080/swagger-ui.html
+    //http://localhost:8081/swagger-ui.html
 
     private final PeliculaService peliculaService;
 
