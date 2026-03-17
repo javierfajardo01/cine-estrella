@@ -1,0 +1,8 @@
+# Carpetas que no necesita el build de Docker
+target/
+.idea/
+.mvn/
+.git/
+.gitignore
+*.iml
+*.md
