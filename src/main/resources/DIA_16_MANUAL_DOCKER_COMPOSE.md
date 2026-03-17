@@ -1428,6 +1428,236 @@ Este comando es el equivalente a "compilar sin ejecutar". Usadlo siempre antes d
 
 ---
 
+---
+
+# Anexo C: Seguridad — Proteger Secretos antes de Subir a GitHub
+
+Antes de hacer `git push` de vuestro proyecto, hay algo critico que debeis resolver: **los secretos**. Contraseñas de base de datos, API keys, tokens... nada de eso debe acabar en GitHub. Si alguien encuentra vuestra contraseña en un repositorio publico, puede usarla para acceder a vuestros servicios, generar costes en APIs de pago, o peor.
+
+Esto no es teoria — **pasa constantemente**. Hay bots que escanean GitHub automaticamente buscando API keys expuestas. Cuando encuentran una, la usan en minutos.
+
+## El problema
+
+Ahora mismo, vuestro `docker-compose.yml` probablemente tiene algo asi:
+
+```yaml
+environment:
+  - SPRING_DATASOURCE_PASSWORD=secret
+  - POSTGRES_PASSWORD=secret
+```
+
+Y si usais una API externa (como la API de la NBA, OpenWeather, etc.), posiblemente teneis la key directamente en el codigo Java:
+
+```java
+// MAL — la API key esta en el codigo que sube a GitHub
+.defaultHeader("X-RapidAPI-Key", "abc123miKeySecreta")
+```
+
+Si haceis `git push` con esto, la contraseña y la key quedan **para siempre** en el historial de git. Aunque las borreis despues, siguen accesibles en commits anteriores.
+
+## La solucion: archivo `.env`
+
+La idea es simple: los secretos van en un archivo `.env` que **nunca sube a git**. El resto de archivos referencian variables (`${VARIABLE}`) en vez de valores reales.
+
+### Paso 1: Crear el archivo `.env`
+
+En la raiz del proyecto (al lado del `pom.xml` y `docker-compose.yml`), crear un archivo llamado `.env` (con el punto delante, sin extension):
+
+```
+# Secretos de la base de datos
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=secret
+POSTGRES_DB=pizzeria
+
+# Secretos de APIs externas (si usais alguna)
+# NBA_API_KEY=vuestra_key_aqui
+# OPENWEATHER_KEY=vuestra_key_aqui
+```
+
+> **Crear el archivo en IntelliJ:** Click derecho en la raiz del proyecto > New > File > escribir `.env` (asegurarse de que no le anada extension).
+
+### Paso 2: Añadir `.env` al `.gitignore`
+
+Abrir el `.gitignore` y anadir esta linea:
+
+```
+.env
+```
+
+Esto le dice a git: "ignora este archivo, no lo subas nunca". Verificar que funciona:
+
+```powershell
+git status
+# .env NO deberia aparecer en la lista de archivos
+```
+
+### Paso 3: Modificar `docker-compose.yml` para usar variables
+
+Donde antes tenian los valores directos, ahora ponen `${}`:
+
+```yaml
+services:
+  app:
+    build: .
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQLDialect
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_SQL_INIT_MODE=never
+      - SPRING_H2_CONSOLE_ENABLED=false
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  adminer:
+    image: adminer
+    ports:
+      - "9090:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+```
+
+Docker Compose lee el `.env` automaticamente si esta en la misma carpeta que el `docker-compose.yml`. No hay que configurar nada mas.
+
+### Paso 4: Si usais una API externa, sacar la key del codigo Java
+
+**ANTES (MAL):**
+```java
+@Bean
+public WebClient webClient() {
+    return WebClient.builder()
+            .baseUrl("https://api-ejemplo.com")
+            .defaultHeader("X-API-Key", "abc123miKeySecreta")  // EXPUESTA
+            .build();
+}
+```
+
+**DESPUES (BIEN):**
+```java
+@Bean
+public WebClient webClient(@Value("${api.key}") String apiKey) {
+    return WebClient.builder()
+            .baseUrl("https://api-ejemplo.com")
+            .defaultHeader("X-API-Key", apiKey)  // LEE DE PROPERTIES
+            .build();
+}
+```
+
+No olvidar el import:
+```java
+import org.springframework.beans.factory.annotation.Value;
+```
+
+Y en `application.properties`:
+```properties
+api.key=${MI_API_KEY}
+```
+
+Y en `.env`:
+```
+MI_API_KEY=abc123miKeySecreta
+```
+
+Asi la key fluye: `.env` -> variable de entorno -> `application.properties` -> codigo Java. Y el `.env` nunca sube a git.
+
+### Paso 5: Crear `.env.example` (este SI sube a GitHub)
+
+Crear un archivo `.env.example` con las mismas variables pero **sin los valores reales**:
+
+```
+# Copiar este archivo como .env y rellenar los valores
+# cp .env.example .env
+
+POSTGRES_USER=
+POSTGRES_PASSWORD=
+POSTGRES_DB=
+
+# Solo si usais API externa:
+# MI_API_KEY=
+```
+
+Este archivo **SI sube a GitHub**. Sirve para que quien clone el repositorio sepa que variables necesita crear en su propio `.env`.
+
+### Paso 6: Verificar antes de hacer push
+
+```powershell
+# 1. Comprobar que .env NO aparece como archivo tracked
+git status
+# .env NO deberia aparecer
+
+# 2. Comprobar que docker-compose funciona con las variables
+docker compose config
+# Deberia mostrar el YAML con los valores del .env sustituidos
+
+# 3. Buscar secretos accidentales en todos los archivos
+findstr /S /I "password" src\*.java
+findstr /S /I "api.key" src\*.java
+# No deberia aparecer ningun valor real, solo ${} o @Value
+```
+
+## Resumen visual
+
+```
+mi-proyecto/
+    .env                  <-- SECRETOS REALES (NO sube a git)
+    .env.example          <-- PLANTILLA VACIA (SI sube a git)
+    .gitignore            <-- Contiene ".env"
+    docker-compose.yml    <-- Solo tiene ${VARIABLES} (SI sube a git)
+    pom.xml
+    Dockerfile
+    src/
+        main/
+            resources/
+                application.properties  <-- Solo tiene ${VARIABLES} (SI sube a git)
+```
+
+| Archivo | Contiene secretos? | Sube a GitHub? |
+|---------|-------------------|----------------|
+| `.env` | **SI** | **NO** (en .gitignore) |
+| `.env.example` | No (valores vacios) | SI |
+| `docker-compose.yml` | No (solo `${}`) | SI |
+| `application.properties` | No (solo `${}`) | SI |
+| Codigo Java (`.java`) | No (usa `@Value`) | SI |
+
+## Que pasa si ya subieron secretos a GitHub?
+
+Si ya hicieron `git push` con contraseñas en el codigo:
+
+1. **El secreto ya esta en el historial de git** — borrarlo del archivo no lo borra del historial
+2. **Cambiar la contraseña/key inmediatamente** — generar una nueva en el servicio (RapidAPI, PostgreSQL, etc.)
+3. La nueva contraseña va **solo en `.env`**, nunca mas en el codigo
+4. Para limpiar el historial completo se puede usar `git filter-branch` o herramientas como BFG Repo Cleaner, pero eso es avanzado — lo importante es que la key vieja ya no sirve porque la cambiaron
+
+> **Regla de oro:** Si alguna vez dudas sobre si algo es un secreto, tratalo como secreto. Es mejor tener una variable de entorno de mas que una contraseña expuesta en GitHub.
+
+---
+
 ## Creditos y referencias
 
 Este proyecto ha sido desarrollado siguiendo la metodologia y el codigo base de **Juan Marcelo Gutierrez Miranda** @TodoEconometria.
