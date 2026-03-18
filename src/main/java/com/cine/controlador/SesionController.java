@@ -3,6 +3,7 @@ package com.cine.controlador;
 
 import com.cine.modelo.Sesion;
 import com.cine.servicio.SesionService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,12 +32,12 @@ public class SesionController {
     }
 
     @PostMapping
-    public ResponseEntity<Sesion> crear(@jakarta.validation.Valid @RequestBody Sesion sesion) {
+    public ResponseEntity<Sesion> crear(@Valid @RequestBody Sesion sesion) {
         return ResponseEntity.status(HttpStatus.CREATED).body(sesionService.crear(sesion));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Sesion> actualizar(@PathVariable Long id, @jakarta.validation.Valid @RequestBody Sesion sesion) {
+    public ResponseEntity<Sesion> actualizar(@PathVariable Long id, @Valid @RequestBody Sesion sesion) {
         return sesionService.buscarPorId(id)
                 .map(s -> {
                     sesion.setId(id);
