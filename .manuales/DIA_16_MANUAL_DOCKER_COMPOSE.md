@@ -224,7 +224,7 @@ services:
   # Servicio 1: La aplicacion Spring Boot (pizzeria)
   # =====================================================
   app:
-    build: .
+    build: ../src/main/java
     ports:
       - "8081:8081"
     environment:
@@ -254,7 +254,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
       timeout: 5s
       retries: 5
