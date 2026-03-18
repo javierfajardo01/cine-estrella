@@ -38,12 +38,12 @@ public class SesionController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Sesion> actualizar(@PathVariable Long id, @Valid @RequestBody Sesion sesion) {
-        return sesionService.buscarPorId(id)
-                .map(s -> {
-                    sesion.setId(id);
-                    return ResponseEntity.ok(sesionService.crear(sesion));
-                })
-                .orElse(ResponseEntity.notFound().build());
+        try {
+            Sesion sesionActualizada = sesionService.actualizar(id, sesion);
+            return ResponseEntity.ok(sesionActualizada);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")

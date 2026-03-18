@@ -2,7 +2,7 @@ package com.cine.servicio;
 
 import com.cine.modelo.Entrada;
 import com.cine.repositorio.EntradaRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -1,1 +1,12 @@
 -me puedes generar un script sql que rellene las tablas correspondientes a las clases del modelo con datos de prueba?
+El proyecto Cine Estrella es una solución digital diseñada para automatizar la gestión integral de un complejo cinematográfico. Su objetivo es centralizar la información de la cartelera, las salas, la programación de sesiones y la venta de entradas, garantizando la coherencia y seguridad de los datos.
+Funcionalidades Clave:
+1.
+Gestión de Películas y Salas: Permite dar de alta, modificar y eliminar títulos y espacios físicos del cine.
+2.
+Programación Inteligente: Al crear sesiones, el sistema valida la disponibilidad de salas y películas.
+3.
+Venta de Entradas: Controla la asignación de asientos y precios por sesión.
+4.
+Integridad de Datos: Gracias al borrado en cascada, si se elimina una sala o película, el sistema cancela automáticamente todas las sesiones y entradas asociadas para evitar errores.
+Las siguientes capturas de Swagger demuestran las pruebas exitosas de la API, confirmando que el sistema responde correctamente a las operaciones de registro, consulta, actualización y eliminación de datos.

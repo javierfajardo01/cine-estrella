@@ -1,5 +1,6 @@
 package com.cine.modelo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
@@ -7,6 +8,8 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Table(name = "peliculas")
@@ -35,4 +38,8 @@ public class Pelicula {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Clasificacion clasificacion;
+
+    @OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Sesion> sesiones;
 }
