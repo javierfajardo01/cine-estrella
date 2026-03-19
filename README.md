@@ -58,3 +58,5 @@ Maneja la consulta de entradas para las sesiones.
 # A continuación se muestran capturas de pantalla de
 
 # las funcionalidades descritas usando Swagger
+![Captura de pantalla (1).png](docs/img/Captura%20de%20pantalla%20%281%29.png)
+![screencapture-localhost-8081-swagger-ui-index-html-2026-03-19-10_37_19.png](docs/img/screencapture-localhost-8081-swagger-ui-index-html-2026-03-19-10_37_19.png)
