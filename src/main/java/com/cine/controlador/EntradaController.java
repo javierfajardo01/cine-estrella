@@ -3,6 +3,7 @@ package com.cine.controlador;
 
 import com.cine.modelo.Entrada;
 import com.cine.servicio.EntradaService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -51,12 +52,12 @@ public class EntradaController {
     }
 
     @PostMapping
-    public ResponseEntity<Entrada> crear(@jakarta.validation.Valid @RequestBody Entrada entrada) {
+    public ResponseEntity<Entrada> crear(@Valid @RequestBody Entrada entrada) {
         return ResponseEntity.status(HttpStatus.CREATED).body(entradaService.crear(entrada));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Entrada> actualizar(@PathVariable Long id, @jakarta.validation.Valid @RequestBody Entrada entrada) {
+    public ResponseEntity<Entrada> actualizar(@PathVariable Long id, @Valid @RequestBody Entrada entrada) {
         return entradaService.buscarPorId(id)
                 .map(e -> {
                     entrada.setId(id);

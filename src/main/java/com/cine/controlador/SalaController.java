@@ -3,6 +3,7 @@ package com.cine.controlador;
 import com.cine.modelo.Sala;
 import com.cine.servicio.SalaService;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,12 +32,12 @@ public class SalaController {
     }
 
     @PostMapping
-    public ResponseEntity<com.cine.modelo.Sala> crear(@jakarta.validation.Valid @RequestBody com.cine.modelo.Sala sala) {
+    public ResponseEntity<Sala> crear(@Valid @RequestBody Sala sala) {
         return ResponseEntity.status(HttpStatus.CREATED).body(salaService.crear(sala));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<com.cine.modelo.Sala> actualizar(@PathVariable Long id, @jakarta.validation.Valid @RequestBody com.cine.modelo.Sala sala) {
+    public ResponseEntity<Sala> actualizar(@PathVariable Long id, @Valid @RequestBody Sala sala) {
         return salaService.buscarPorId(id)
                 .map(s -> {
                     sala.setId(id);
